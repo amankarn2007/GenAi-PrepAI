@@ -26,9 +26,10 @@ export function useAuth() {
         try {
             const data = await login({ email, password });
             setUser(data.user);
-            
+            return true; //successfully login
         } catch(err) {
             console.log("Client side error in login function");
+            return false; //error in login
         } finally {
             setTimeout(() => {
                 setLoading(false);
@@ -42,9 +43,10 @@ export function useAuth() {
         try {
             const data = await register({ username, email, password });
             setUser(data.user);
-
+            return true;
         } catch(err) {
             console.log("Client side error in register function");
+            return false;
         } finally {
             setLoading(false);
         }
