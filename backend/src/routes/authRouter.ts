@@ -1,13 +1,13 @@
 import { Router } from "express";
-import { getMe, logout, loign, register, verifyEmail } from "../controller/authController.js";
+import { getMe, loginUser, logout, registerUser, verifyEmail } from "../controller/authController.js";
 const authRouter = Router();
 
 
 // POST '/api/auth/register'
-authRouter.post("/register", register)
+authRouter.post("/register", registerUser)
 
 // POST '/api/auth/login'
-authRouter.post("/loign", loign)
+authRouter.post("/login", loginUser)
 
 // GET '/api/auth/logout'
 authRouter.get("/logout", logout)

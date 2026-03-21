@@ -2,8 +2,10 @@ import type { Request, Response } from "express";
 import prismaClient from "../config/db.js";
 import { loginSchema, registerSchema } from "../utils/types.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import generateToken from "../utils/generateToken.js";
 
-export const register = async (req: Request, res: Response) => {
+export const registerUser = async (req: Request, res: Response) => {
     const parsedResult = registerSchema.safeParse(req.body);
 
     if(!parsedResult.success) {
@@ -42,6 +44,8 @@ export const register = async (req: Request, res: Response) => {
         /*-----Otp verification part-----*/
         /*-----Otp verification part-----*/
 
+        //this func will create both token, set in cookies and return accessToken
+        const accessToken = await generateToken(user.id, res);
 
         res.status(201).json({
             message: "User created successfully",
@@ -49,17 +53,18 @@ export const register = async (req: Request, res: Response) => {
                 username: user.username,
                 email: user.email,
                 verified: user.verified
-            }
+            },
+            accessToken
         })
 
     } catch(err) {
-        res.json({
-            message: "Error in register"
+        res.status(500).json({
+            message: "Internal server error"
         })
     }
 }
 
-export const loign = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response) => {
     const parsedResult = loginSchema.safeParse(req.body);
 
     if(!parsedResult.success) {
@@ -91,11 +96,22 @@ export const loign = async (req: Request, res: Response) => {
             })
         }
 
-        
+        //this func will create both token, set in cookies and return accessToken
+        const accessToken = await generateToken(user.id, res);
+
+        // send accessToken in res
+        res.status(200).json({
+            message: "User loged in successfully",
+            user: {
+                username: user.username,
+                email: user.email
+            },
+            accessToken
+        })
 
     } catch(err) {
-        res.json({
-            message: "Can't login right now"
+        res.status(500).json({
+            message: "Internal server error"
         })
     }
 }
