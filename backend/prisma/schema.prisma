@@ -29,4 +29,6 @@ model Otp {
 model Blacklist {
   id                        String            @default(uuid())          @id
   jti                       String            @unique
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
 }
