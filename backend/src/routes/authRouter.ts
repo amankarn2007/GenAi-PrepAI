@@ -16,9 +16,9 @@ authRouter.get("/logout", logout)
 authRouter.get("/get-me", getMe)
 
 // GET '/api/auth/refresh-token'
-authRouter.get("refresh-token", refreshToken);
+authRouter.get("/refresh-token", refreshToken);
 
 // GET '/api/auth/verify-email'
-authRouter.get("verify-email", verifyEmail)
+authRouter.get("/verify-email", verifyEmail)
 
 export default authRouter;

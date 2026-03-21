@@ -24,5 +24,10 @@ export default async function generateToken(userId: string, res: Response) {
         maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
-    return accessToken;
+    res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 15 * 60 * 1000
+    })
 }
