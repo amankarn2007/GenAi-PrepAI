@@ -14,6 +14,7 @@ model User {
   password                  String
   verified                  Boolean           @default(false)
   otps                      Otp[]
+  reports                   InterviewReport[] //interview relation
 }
 
 model Otp {
@@ -32,4 +33,61 @@ model Blacklist {
   createdAt                 DateTime          @default(now())
   updatedAt                 DateTime          @updatedAt
   //expiresAt for cleanup(crone cleanup)
+}
+
+model InterviewReport {
+  id                        String            @default(uuid())          @id
+  jobDescription            String
+  resume                    String
+  selfDescription           String
+  matchScore                Int
+  title                     String
+
+  technicalQuestion         TechnicalQuestion[]
+  behavioralQuestions       BehavioralQuestion[]
+  skillGaps                 SkillGap[]
+  preparationPlan           PreparationPlan[]  
+
+  // Relation to user
+  userId                    String
+  user                      User              @relation(fields: [userId], references: [id])
+}
+
+model TechnicalQuestion {
+  id                        String            @id
+  question                  String
+  intention                 String
+  answere                   String
+
+  interviewReportId         String
+  interviewReport           InterviewReport   @relation(fields: [interviewReportId], references: [id])
+}
+
+model BehavioralQuestion {
+  id                        String            @id
+  question                  String
+  intention                 String
+  answere                   String
+  
+  interviewReportId         String
+  interviewReport           InterviewReport   @relation(fields: [interviewReportId], references: [id])
+}
+
+model SkillGap {
+  id                        String            @default(uuid())          @id
+  skill                     String
+  severity                  String
+  
+  interviewReportId         String
+  interviewReport           InterviewReport   @relation(fields: [interviewReportId], references: [id])
+}
+
+model PreparationPlan {
+  id                        String            @id @default(uuid())
+  day                       Int
+  focus                     String
+  task                      String[]
+  
+  interviewReportId         String
+  interviewReport           InterviewReport   @relation(fields: [interviewReportId], references: [id])
 }

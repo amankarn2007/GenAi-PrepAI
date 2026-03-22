@@ -4,6 +4,7 @@ import authRouter from "./routes/authRouter.js";
 import morgan from "morgan"
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import interviewRouter from "./routes/interviewRouter.js";
 
 app.use(express.json());
 app.use(morgan("dev"));
@@ -17,7 +18,8 @@ app.get("/", (req, res) => {
     res.send("hiiii");
 })
 
-app.use("/api/auth", authRouter)
+app.use("/api/auth", authRouter);
+app.use("/api/interview", interviewRouter);
 
 const PORT = 3000;
 app.listen(PORT, () => {
