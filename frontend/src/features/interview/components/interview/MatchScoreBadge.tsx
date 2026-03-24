@@ -1,6 +1,6 @@
 
 
-export const MatchScoreBadge = ({ score }: { score: string }) => {
+export const MatchScoreBadge = ({ score }: { score: number }) => {
   const config = {
     High:   { color: "text-emerald-400", bg: "bg-emerald-950", border: "border-emerald-900", bar: "bg-emerald-500", width: "w-4/5" },
     Medium: { color: "text-amber-400",   bg: "bg-amber-950",   border: "border-amber-900",   bar: "bg-amber-500",   width: "w-2/4" },

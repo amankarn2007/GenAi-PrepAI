@@ -18,7 +18,9 @@ export default function InterviewPage() {
 
 
   if (loading) {
-    <Loader />
+    return (
+      <Loader />
+    )
   }
 
   if (!report) {

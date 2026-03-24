@@ -5,7 +5,6 @@ import { QuestionCard } from "./QuestionCard";
 import { RoadMapDay } from "./RoadmapDay";
 import { MatchScoreBadge } from "./MatchScoreBadge";
 import { SkillGapsList } from "./SkillGapList";
-import { StrengthsList } from "./StrengthList";
 
 
 type NavId = "technical" | "behavioral" | "roadmap";
@@ -49,12 +48,8 @@ interface InterviewProps {
 export const Interview = ({ report }: InterviewProps) => {
   const [activeSection, setActiveSection] = useState<NavId>("technical");
 
-  const initials = report.candidateName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+  const displayName = report.title?.split(":")[1]?.trim() || "Candidate";
+  const initials = displayName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
 
   return (
     <div className="min-h-screen bg-zinc-950 p-4 md:p-6 font-sans">
@@ -67,8 +62,8 @@ export const Interview = ({ report }: InterviewProps) => {
               <span className="text-sm font-semibold text-zinc-300">{initials}</span>
             </div>
             <div>
-              <h1 className="font-semibold text-zinc-100 leading-none"> {report.candidateName} </h1>
-              <p className="text-sm text-zinc-500 mt-1">{report.roleAppliedFor}</p>
+              <h1 className="font-semibold text-zinc-100 leading-none"> {displayName} </h1>
+              <p className="text-sm text-zinc-500 mt-1">{report.title}</p>
             </div>
           </div>
           <span className="text-xs px-3 py-1 rounded-full border border-zinc-700 bg-neutral-600 text-zinc-200 shrink-0">
@@ -79,7 +74,7 @@ export const Interview = ({ report }: InterviewProps) => {
         {/* ── Summary banner ── */}
         <div className="px-6 py-4 bg-zinc-900/40 border-b border-zinc-800">
           <p className="text-[12px] uppercase tracking-widest text-zinc-300 mb-1.5">Summary</p>
-          <p className="text-sm text-zinc-400 leading-relaxed max-w-5xl">{report.summary}</p>
+          <p className="text-sm text-zinc-400 leading-relaxed max-w-5xl">{report.selfDescription}</p>
         </div>
 
         {/* ── Body ── */}
@@ -114,11 +109,11 @@ export const Interview = ({ report }: InterviewProps) => {
             {activeSection === "technical" && (
               <div>
                 <p className="text-[11px] uppercase tracking-widest text-zinc-400 mb-4">
-                  Technical questions — {report.technicalQuestions.length} total
+                  Technical questions — {report.technicalQuestion.length} total
                 </p>
                 <div className="flex flex-col gap-2.5">
-                  {report.technicalQuestions.map((q, i) => (
-                    <QuestionCard key={i} item={q} index={i} />
+                  {report.technicalQuestion?.map((q, i) => (
+                    <QuestionCard key={q.id} item={q} index={i} />
                   ))}
                 </div>
               </div>
@@ -131,7 +126,7 @@ export const Interview = ({ report }: InterviewProps) => {
                 </p>
                 <div className="flex flex-col gap-2.5">
                   {report.behavioralQuestions.map((q, i) => (
-                    <QuestionCard key={i} item={q} index={i} />
+                    <QuestionCard key={i} item={{...q, answer: q.answer}} index={i} />
                   ))}
                 </div>
               </div>
@@ -145,7 +140,7 @@ export const Interview = ({ report }: InterviewProps) => {
                 <div className="flex flex-col">
                   {report.preparationPlan.map((step, i) => (
                     <RoadMapDay
-                      key={i}
+                      key={step.id}
                       item={step}
                       index={i}
                       isLast={i === report.preparationPlan.length - 1}
@@ -159,9 +154,7 @@ export const Interview = ({ report }: InterviewProps) => {
 
           {/* Right panel */}
           <aside className="w-full md:w-60 shrink-0 border-t md:border-t-0 md:border-l border-zinc-800 bg-zinc-900/50 p-5 flex flex-col gap-6 overflow-y-auto">
-            <MatchScoreBadge score={report.overallMatchScore} />
-            <div className="w-full h-px bg-zinc-800" />
-            <StrengthsList strengths={report.strengths} />
+            <MatchScoreBadge score={report.matchScore} />
             <div className="w-full h-px bg-zinc-800" />
             <SkillGapsList skillGaps={report.skillGaps} />
           </aside>
