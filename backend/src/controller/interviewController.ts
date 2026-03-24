@@ -5,12 +5,8 @@ import prismaClient from "../config/db.js";
 import { generateReport } from "../utils/types.js";
 
 
-interface AIReportResponse {
-    title: string;
-    matchScore: number;
-}
 
-// expects resume, selfDescription, jobDescription
+// expects resume as req.file, selfDescription as string, jobDescription as string
 export async function generateInterviewReportController(req: Request, res: Response) {
     if(!req.file) {
         return res.status(400).json({
@@ -47,6 +43,7 @@ export async function generateInterviewReportController(req: Request, res: Respo
             })
         }
 
+        //Keys: [ 'match_score', 'technical_questions', 'behavioral_questions', 'skill_gaps', 'preparation_plan' ]
         const interviewReport = await prismaClient.interviewReport.create({
             data: {
                 userId: (req as any).user.id,
@@ -54,7 +51,7 @@ export async function generateInterviewReportController(req: Request, res: Respo
                 selfDescription,
                 jobDescription,
                 title: aiResponse.title || info.info?.Title || "Untitled Report",
-                matchScore: aiResponse.matchScore || 0,
+                matchScore: aiResponse.matchScore || aiResponse.match_score || 0,
             }
         })
 
@@ -65,8 +62,66 @@ export async function generateInterviewReportController(req: Request, res: Respo
         })
     } catch (err) {
         res.status(500).json({
-            message: "Can't generate report"
+            message: "Can't generate report",
+            err: err
         })
     }
+
+}
+
+// get a specific report
+export async function getInterviewReportByIdController(req: Request, res: Response) {
+    try {   
+        const { interviewId } = req.params;
+
+        if(typeof interviewId !== 'string') {
+            return res.status(400).json({
+                message: "Wrong interview id"
+            })
+        }
+
+        const report = await prismaClient.interviewReport.findFirst({
+            where: {
+                id: interviewId
+            }
+        })
+
+        if(!report) {
+            return res.status(404).json({
+                message: "Can't find report"
+            })
+        }
+
+        return res.json(report)
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Something went wrong while report finding"
+        })
+    }
+}
+
+// get all interview reports
+export async function getAllInterviewReportsController(req: Request, res: Response) {
+    try {
+        const interviewReport = await prismaClient.interviewReport.findMany({
+            where: {
+                userId: (req as any).user.id
+            }
+        })
+
+        res.status(200).json({
+            message: "Interview report fetched successfully",
+            report: interviewReport
+        })
+        
+    } catch (error) {
+        res.status(500).json({
+            message: "Something went wrong while fetching all reports"
+        })   
+    }
+} 
+
+export async function generateResumePdfController() {
 
 }

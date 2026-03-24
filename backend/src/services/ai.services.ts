@@ -52,7 +52,7 @@ async function generateInterviewReport({resume, selfDescription, jobDescription}
             Resume: ${resume}
             Self Description: ${selfDescription}
             Job Description: ${jobDescription}
-            Generate a detailed interview report with match score, technical questions, behavioral questions, skill gaps, and preparation plan.`,
+            Generate a detailed interview report with match score, technical questions, behavioral questions, skill gaps, and mainly give the preparation plan.`,
 
             config: {
                 responseMimeType: "application/json",
@@ -62,7 +62,7 @@ async function generateInterviewReport({resume, selfDescription, jobDescription}
         })
 
         //@ts-ignore
-        const report = JSON.parse(response.text);   
+        const report = JSON.parse(response.text);
         return report;
 
     } catch(err) {
