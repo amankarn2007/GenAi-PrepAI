@@ -52,7 +52,7 @@ async function generateInterviewReport({resume, selfDescription, jobDescription}
             Resume: ${resume}
             Self Description: ${selfDescription}
             Job Description: ${jobDescription}
-            Generate a detailed interview report with match score, technical questions, behavioral questions, skill gaps, and mainly give the preparation plan.`,
+            Generate a detailed interview report with match score, technical questions, behavioral questions, skill gaps, and mainly give the preparation plan.    You MUST return a JSON object with exactly these keys: summary, technical_questions (array), behavioral_questions (array), skill_gaps (array), preparation_plan (array), match_score (number), title (string).`,
 
             config: {
                 responseMimeType: "application/json",

@@ -42,6 +42,13 @@ export async function generateInterviewReportController(req: Request, res: Respo
                 message: "Ai failed to generate report"
             })
         }
+        //console.log(aiResponse);
+
+        // safely get these before creating in db
+        const techQs = aiResponse.technicalQuestions || aiResponse.technical_questions || [];
+        const behQs = aiResponse.behavioralQuestions || aiResponse.behavioral_questions || [];
+        const gaps = aiResponse.areasForImprovement || aiResponse.skill_gaps || [];
+        const plan = aiResponse.preparationPlan || aiResponse.preparation_plan || [];
 
         //Keys: [ 'match_score', 'technical_questions', 'behavioral_questions', 'skill_gaps', 'preparation_plan' ]
         const interviewReport = await prismaClient.interviewReport.create({
@@ -52,15 +59,54 @@ export async function generateInterviewReportController(req: Request, res: Respo
                 jobDescription,
                 title: aiResponse.title || info.info?.Title || "Untitled Report",
                 matchScore: aiResponse.matchScore || aiResponse.match_score || 0,
+                
+                // NESTED WRITES
+                technicalQuestion: {
+                    create: techQs.map((q: string) => ({
+                        question: q,
+                        intention: "Technical Evaluation",
+                        answer: "To be answered" 
+                    }))
+                },
+                behavioralQuestions: {
+                    create: behQs.map((q: string) => ({
+                        question: q,
+                        intention: "Behavioral Evaluation",
+                        answer: "To be answered"
+                    }))
+                },
+                skillGaps: {
+                    create: gaps.map((s: string) => ({
+                        skill: s,
+                        severity: "Medium" // Default
+                    }))
+                },
+                preparationPlan: {
+                    create: plan.map((p: string, index: number) => ({
+                        day: index + 1,
+                        focus: "Preparation",
+                        task: [p]
+                    }))
+                }
+            },
+            // 'Include' is important, to get all data in return
+            include: {
+                technicalQuestion: true,
+                behavioralQuestions: true,
+                skillGaps: true,
+                preparationPlan: true
             }
         })
+
+        //console.log(interviewReport);
 
         res.status(201).json({
             message: "Interview report generated successfully",
             reportId: interviewReport.id,
-            report: aiResponse
+            report: interviewReport
         })
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             message: "Can't generate report",
             err: err
@@ -83,6 +129,12 @@ export async function getInterviewReportByIdController(req: Request, res: Respon
         const report = await prismaClient.interviewReport.findFirst({
             where: {
                 id: interviewId
+            },
+            include: {
+                technicalQuestion: true,
+                behavioralQuestions: true,
+                skillGaps: true,
+                preparationPlan: true
             }
         })
 

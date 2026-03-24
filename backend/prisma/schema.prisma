@@ -54,20 +54,20 @@ model InterviewReport {
 }
 
 model TechnicalQuestion {
-  id                        String            @id
+  id                        String            @default(uuid())          @id
   question                  String
   intention                 String
-  answere                   String
+  answer                    String
 
   interviewReportId         String
   interviewReport           InterviewReport   @relation(fields: [interviewReportId], references: [id])
 }
 
 model BehavioralQuestion {
-  id                        String            @id
+  id                        String            @default(uuid())          @id
   question                  String
   intention                 String
-  answere                   String
+  answer                    String
   
   interviewReportId         String
   interviewReport           InterviewReport   @relation(fields: [interviewReportId], references: [id])
@@ -83,7 +83,7 @@ model SkillGap {
 }
 
 model PreparationPlan {
-  id                        String            @id @default(uuid())
+  id                        String            @default(uuid())          @id
   day                       Int
   focus                     String
   task                      String[]
