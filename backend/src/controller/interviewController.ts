@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { PDFParse } from "pdf-parse"
-import { generateInterviewReport } from "../services/ai.services.js";
+import { generateInterviewReport, generatePDF } from "../services/ai.services.js";
 import prismaClient from "../config/db.js";
 import { generateReport } from "../utils/types.js";
 
@@ -174,6 +174,34 @@ export async function getAllInterviewReportsController(req: Request, res: Respon
     }
 } 
 
-export async function generateResumePdfController() {
+export async function generateResumePdfController(req: Request, res: Response) {
+    const { interviewReportId } = req.params;
+    if(!interviewReportId) {
+        return res.status(400).json({
+            message: "interview id is missing"
+        })
+    }
+
+    const interviewReport = await prismaClient.interviewReport.findFirst({
+        where: {
+            id: (interviewReportId as string)
+        }
+    })
+
+    if(!interviewReport) {
+        return res.status(404).json({
+            message: "Interview report not found"
+        })
+    }
+
+    const { resume, jobDescription, selfDescription } = interviewReport;
+    const pdfBuffer = await  generatePDF({resume, selfDescription, jobDescription});
+
+    res.set({
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`
+    })
+
+    res.send(pdfBuffer);
 
 }

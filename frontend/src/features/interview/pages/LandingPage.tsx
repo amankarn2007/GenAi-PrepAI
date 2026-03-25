@@ -1,28 +1,26 @@
-
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight, BrainCircuit, Target, Code2, Users, ArrowUpRight } from "lucide-react";
 import { useNavigate } from "react-router";
 
 
 export default function LandingPage() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen relative overflow-hidden flex flex-col">
       {/* Background Effects */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-primary/20 blur-[120px] rounded-full pointer-events-none opacity-50" />
-      <div className="absolute bottom-0 right-0 w-[800px] h-[600px] bg-accent/10 blur-[150px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-250 h-125 bg-primary/20 blur-[120px] rounded-full pointer-events-none opacity-50" />
+      <div className="absolute bottom-0 right-0 w-200 h-150 bg-accent/10 blur-[150px] rounded-full pointer-events-none" />
 
       {/* Nav */}
       <nav className="relative z-10 max-w-7xl mx-auto w-full px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center box-glow">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-accent flex items-center justify-center box-glow">
             <BrainCircuit className="w-6 h-6 text-white" />
           </div>
           <span className="font-display font-bold text-2xl tracking-tight text-white">PrepAI</span>
         </div>
-        <button 
-          onClick={() => navigate("/login")}
+        <button onClick={() => navigate("/login")}
           className="text-sm font-medium text-white hover:text-primary transition-colors flex items-center gap-2"
         >
           Go to Dashboard <ArrowRight className="w-4 h-4" />
@@ -30,7 +28,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero */}
-      <main className="flex-grow flex flex-col items-center justify-center text-center px-6 relative z-10 pb-20">
+      <main className="grow flex flex-col items-center justify-center text-center px-6 relative z-10 pb-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -48,7 +46,7 @@ export default function LandingPage() {
           className="text-5xl md:text-7xl font-display font-extrabold tracking-tight text-white max-w-4xl leading-tight mb-6"
         >
           Land Your Dream Job With <br className="hidden md:block" />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-accent to-primary text-glow animate-pulse">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-primary via-accent to-primary text-glow animate-pulse">
             AI-Powered
           </span> Prep
         </motion.h1>

@@ -1,15 +1,19 @@
 import Footer from "../components/home/Footer"
 import Header from "../components/home/Header"
 import { Briefcase, User, Upload, Info } from 'lucide-react';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useInterview } from "../hooks/useInterview";
 import { useNavigate } from "react-router";
 import Loader from "../components/Loader";
 import { ChevronRight, BarChart2 } from 'lucide-react';
 
+
 export default function Home() {
-    //loading implementation required
-    const { loading } = useInterview();
+    const { loading, getAllReports } = useInterview();
+
+    useEffect(() => { // fetch all reports on first render
+        getAllReports();
+    }, []);
 
     if (loading) {
         return <Loader />
@@ -128,7 +132,7 @@ function Main() {
 
                             {/* Info box */}
                             <div className="flex gap-2 p-2.5 bg-blue-900/30 border border-blue-800/50 rounded-lg">
-                                <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                                <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                                 <p className="text-xs text-gray-300">
                                     Either a <strong className="text-white">Resume</strong> or <strong className="text-white">Self Description</strong> is required.
                                 </p>

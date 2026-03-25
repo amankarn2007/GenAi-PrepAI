@@ -2,6 +2,14 @@ import axios from "axios";
 
 const baseUrl = "http://localhost:3000";
 
+export async function logoutApi() {
+    const response = await axios.get(`${baseUrl}/api/auth/logout`, {
+        withCredentials: true
+    });
+
+    return response.data;
+}
+
 export interface generateReportType {
     jobDescription: string,
     selfDescription: string,
@@ -44,6 +52,17 @@ export async function getAllInterviewReports() {
     return response.data;
 }
 
-export async function generateResumePdf() {
-    
+export async function generateResumePdf({interviewId}: {interviewId: string}) {
+    try {
+        const response = await axios.post(`${baseUrl}/api/interview/resume/pdf/${interviewId}`, null, {
+            responseType: "blob",
+            withCredentials: true
+        })
+
+        return response.data;
+                
+    } catch (error) {
+        console.log(error);
+    }
+
 }

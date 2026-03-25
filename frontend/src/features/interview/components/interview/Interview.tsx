@@ -1,12 +1,12 @@
 import { useState, type JSX } from "react";
-//import { useNavigate, useParams } from "react-router";
 import type { InterviewReport } from "../../types/types";
 import { QuestionCard } from "./QuestionCard";
 import { RoadMapDay } from "./RoadmapDay";
 import { MatchScoreBadge } from "./MatchScoreBadge";
 import { SkillGapsList } from "./SkillGapList";
-import { useNavigate } from "react-router";
-
+import { useNavigate, useParams } from "react-router";
+import { useInterview } from "../../hooks/useInterview";
+import Loader from "../Loader";
 
 type NavId = "technical" | "behavioral" | "roadmap";
 
@@ -49,9 +49,22 @@ interface InterviewProps {
 export const Interview = ({ report }: InterviewProps) => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<NavId>("technical");
+  const { interviewId } = useParams<{ interviewId: string }>();
+  const { getResumePdf, loading } = useInterview();
+
+  
+  async function generatePdf() { //call useInterview hook to generate pdf
+    if(!interviewId) return;
+
+    await getResumePdf({interviewId: interviewId});
+  }
 
   const displayName = report.title?.split(":")[1]?.trim() || "Candidate";
   const initials = displayName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
+
+  if(loading) {
+    return <Loader />
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 p-4 md:p-6 font-sans">
@@ -103,6 +116,11 @@ export const Interview = ({ report }: InterviewProps) => {
                 {item.label}
               </button>
             ))}
+
+            <div className="flex items-center gap-2.5 shrink-0 md:w-full text-left px-3 py-2.5 rounded-lg text-sm transition-colors font-medium text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 cursor-default" onClick={generatePdf}>
+              <i className="fa-regular fa-file-lines"></i>
+              <p>Resume</p>
+            </div>
           </aside>
 
           {/* Main content */}

@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai"
 import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
+import puppeteer, { Page } from "puppeteer"
 
 
 const ai = new GoogleGenAI({
@@ -72,4 +73,100 @@ async function generateInterviewReport({resume, selfDescription, jobDescription}
 
 }
 
-export { generateInterviewReport }
+async function generatePdfFromHtml({htmlContent}: {htmlContent: string}) {
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+
+    await page.setViewport({
+        width: 794,
+        height: 1123,
+        deviceScaleFactor: 1
+    });
+
+    await page.setContent(htmlContent, {
+        waitUntil: 'networkidle2'
+    })
+
+    await page.emulateMediaType("print");
+
+    const pdfBuffer = await page.pdf({
+        format: 'A4',
+        printBackground: true,
+        margin: {
+            top: "0px",
+            bottom: "0px",
+            left: "0px",
+            right: "0px"
+        },
+        preferCSSPageSize: true
+    })
+
+    await browser.close();
+    return pdfBuffer;
+}
+
+
+async function generatePDF({resume, selfDescription, jobDescription}: GenerateReportParams) {
+
+    const resumePdfSchema = z.object({
+        html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
+    })
+
+    const prompt = `You are a professional resume writer. Generate a clean, ATS-friendly resume in HTML format.
+
+        CANDIDATE DATA (use EXACTLY as provided, do not modify names, links, or any details):
+        Resume: ${resume}
+        Self Description: ${selfDescription}
+        Job Description: ${jobDescription}
+
+        STRICT RULES:
+        1. Copy all names, emails, phone numbers, GitHub/LinkedIn URLs EXACTLY as given
+        2. Keep it to ONE page only — no scrolling, no overflow
+        3. Do not add skills or experience not mentioned
+        4. HTML must be self-contained with inline CSS only
+        5. Do NOT use mm/cm units — use px only
+        6. The entire resume must fit within 794px wide × 1123px tall (A4 at 96dpi)
+
+        LAYOUT & STYLE RULES:
+        - Outer wrapper: width: 794px; height: 1123px; overflow: hidden; box-sizing: border-box; padding: 40px 50px;
+        - Font: Arial, sans-serif
+        - Body text: 13px; line-height: 1.4
+        - Section headings: 15px, font-weight: bold, border-bottom: 1px solid #333, margin-bottom: 4px
+        - Name heading: 22px, font-weight: bold
+        - Subheading/title: 13px, color: #555
+        - Use a two-column layout: left column 65% for main content, right column 35% for skills/contact
+        - All margins and paddings should be small (4px–10px) to keep content compact
+        - Bullet points: margin: 2px 0; padding-left: 14px
+        - Do NOT use <table> for layout — use flexbox divs
+        - Avoid page-break CSS properties entirely
+
+        CRITICAL: Every section must fit. If content is too long, abbreviate bullet points rather than overflow.
+
+        Return ONLY valid JSON: { "html": "<complete html string here>" }`
+    ;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+
+            config: {
+                responseMimeType: "application/json",
+                //@ts-ignore
+                responseJsonSchema: zodToJsonSchema(resumePdfSchema),
+            }
+        })
+
+        const jsonContent = JSON.parse(response.text!);
+
+        const pdfBuffer = await generatePdfFromHtml({htmlContent: jsonContent.html});
+
+        return pdfBuffer;
+
+    } catch (err) {
+        console.log("Error in generating interview PDF: ", err);
+        throw err;
+    }
+}
+
+export { generateInterviewReport, generatePDF }
