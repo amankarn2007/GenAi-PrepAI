@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router"
 import { useAuth } from "../hooks/useAuth";
+import Flash from "../components/Flash";
 
 
 export default function Register() {
@@ -8,6 +9,7 @@ export default function Register() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [flash, setFlash] = useState(false);
 
     const { loading, handleRegister } = useAuth();
 
@@ -16,6 +18,8 @@ export default function Register() {
         const success = await handleRegister({username, email, password});
         if(success) {
             navigate("/dashboard")
+        } else {
+            setFlash(true);
         }
     }
 
@@ -56,6 +60,8 @@ export default function Register() {
                     <p className="text-white ml-2 mt-2">Already have and account ? <span className="text-red-700 cursor-pointer" onClick={() => navigate("/login")}>Login</span></p>
                 </div>
             </div>
+
+            { flash && <Flash setFlash={setFlash} /> }
         </div>
     )
 }

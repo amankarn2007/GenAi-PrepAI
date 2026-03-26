@@ -8,7 +8,8 @@ export default async function authUser(req: Request, res: Response, next: NextFu
 
     if(!accessToken) {
         return res.status(400).json({
-            message: "Token is missing"
+            //message: "Token is missing"
+            message: "you're not loged in"
         })
     }
 

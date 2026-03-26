@@ -32,7 +32,7 @@ export async function generateInterviewReport({jobDescription, selfDescription, 
 
         return response.data;
     } catch (error) {
-        console.log(error);
+        console.log("Error in interview api", error);
     }
 }
 

@@ -5,8 +5,7 @@ import prismaClient from "../config/db.js";
 import { generateReport } from "../utils/types.js";
 
 
-
-// expects resume as req.file, selfDescription as string, jobDescription as string
+// expects resume in req.file, selfDescription as string, jobDescription as string
 export async function generateInterviewReportController(req: Request, res: Response) {
     if(!req.file) {
         return res.status(400).json({
@@ -22,29 +21,28 @@ export async function generateInterviewReportController(req: Request, res: Respo
     }
 
     try {
-        const { selfDescription, jobDescription } = parsedResult.data;
         const parser = new PDFParse({data: req.file.buffer});
-
         const result = await parser.getText();
         const resumeContent = typeof result === 'string' ? result : result.text;
+
+        const { selfDescription, jobDescription } = parsedResult.data;
 
         const info = await parser.getInfo(); //meta data
         await parser.destroy(); //free space
 
-        const aiResponse = await generateInterviewReport({
+        const aiResponse = await generateInterviewReport({ //generate raport using ai
             resume: resumeContent,
             selfDescription,
             jobDescription
         }) as any;
-
+        console.log(aiResponse);
         if(!aiResponse) {
             return res.status(500).json({
                 message: "Ai failed to generate report"
             })
         }
-        //console.log(aiResponse);
 
-        // safely get these before creating in db
+        // store aiResponse qs, gaps and plans before creating in db for extra safety
         const techQs = aiResponse.technicalQuestions || aiResponse.technical_questions || [];
         const behQs = aiResponse.behavioralQuestions || aiResponse.behavioral_questions || [];
         const gaps = aiResponse.areasForImprovement || aiResponse.skill_gaps || [];
@@ -64,7 +62,7 @@ export async function generateInterviewReportController(req: Request, res: Respo
                 technicalQuestion: {
                     create: techQs.map((q: string) => ({
                         question: q,
-                        intention: "Technical Evaluation",
+                        intention: "Technical Evaluation", //bcs ai only five questions
                         answer: "To be answered" 
                     }))
                 },
@@ -89,7 +87,7 @@ export async function generateInterviewReportController(req: Request, res: Respo
                     }))
                 }
             },
-            // 'Include' is important, to get all data in return
+            // to get all data in return
             include: {
                 technicalQuestion: true,
                 behavioralQuestions: true,
@@ -112,7 +110,6 @@ export async function generateInterviewReportController(req: Request, res: Respo
             err: err
         })
     }
-
 }
 
 // get a specific report
@@ -130,7 +127,7 @@ export async function getInterviewReportByIdController(req: Request, res: Respon
             where: {
                 id: interviewId
             },
-            include: {
+            include: { // also add these fields
                 technicalQuestion: true,
                 behavioralQuestions: true,
                 skillGaps: true,
@@ -153,7 +150,7 @@ export async function getInterviewReportByIdController(req: Request, res: Respon
     }
 }
 
-// get all interview reports
+// get all interview reports to show list on dashboard
 export async function getAllInterviewReportsController(req: Request, res: Response) {
     try {
         const interviewReport = await prismaClient.interviewReport.findMany({
@@ -182,7 +179,7 @@ export async function generateResumePdfController(req: Request, res: Response) {
         })
     }
 
-    const interviewReport = await prismaClient.interviewReport.findFirst({
+    const interviewReport = await prismaClient.interviewReport.findFirst({ //find report
         where: {
             id: (interviewReportId as string)
         }
@@ -195,9 +192,9 @@ export async function generateResumePdfController(req: Request, res: Response) {
     }
 
     const { resume, jobDescription, selfDescription } = interviewReport;
-    const pdfBuffer = await  generatePDF({resume, selfDescription, jobDescription});
+    const pdfBuffer = await  generatePDF({resume, selfDescription, jobDescription}); //generate pdf
 
-    res.set({
+    res.set({ //set in headers
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename=resume_${interviewReportId}.pdf`
     })

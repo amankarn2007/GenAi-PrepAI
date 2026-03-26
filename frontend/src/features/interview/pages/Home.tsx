@@ -35,7 +35,7 @@ function Main() {
     const jobDescriptionRef = useRef(null)
     const resumeRef = useRef(null)
     const selfDescriptionRef = useRef(null);
-    const { generateReport, reports } = useInterview()
+    const { generateReport, reports, loading } = useInterview()
     const navigate = useNavigate();
 
     async function handleSubmit() {
@@ -54,11 +54,15 @@ function Main() {
             return;
         }
 
+        if(loading) {
+            return <Loader />
+        }
+
         try {
             const data = await generateReport({ jobDescription, selfDescription, resumeFile })
 
             if (data && data.reportId) {
-                navigate(`interview/${data.reportId}`)
+                navigate(`/interview/${data.reportId}`)
             }
         } catch (error) {
             alert("can't generate report right now!");

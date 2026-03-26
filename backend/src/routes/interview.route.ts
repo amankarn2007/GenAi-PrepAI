@@ -10,6 +10,7 @@ import { upload } from "../middlewares/multer.js";
 
 const interviewRouter = Router();
 
+//to generate interview report
 interviewRouter.post("/", authUser, upload.single("resume"), generateInterviewReportController)
 
 

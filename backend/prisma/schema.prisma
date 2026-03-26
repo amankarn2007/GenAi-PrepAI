@@ -35,7 +35,7 @@ model Blacklist {
   //expiresAt for cleanup(crone cleanup)
 }
 
-model InterviewReport {
+model InterviewReport { //report have multiple arrays
   id                        String            @default(uuid())          @id
   jobDescription            String
   resume                    String

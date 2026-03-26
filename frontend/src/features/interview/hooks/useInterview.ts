@@ -17,7 +17,7 @@ export const useInterview = () => {
     const getLogedOut = async () => {
         setLoading(true);
         try {
-            const res = await logoutApi();
+            await logoutApi();
             //console.log(res.message);
             navigate("/");
             

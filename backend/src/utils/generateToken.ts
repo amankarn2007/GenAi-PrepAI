@@ -2,6 +2,7 @@ import type { Response } from "express";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from 'uuid';
 
+//tokens in cookies for authentication
 export default async function generateToken(userId: string, res: Response) {
     const refreshToken = jwt.sign({
         id: userId,

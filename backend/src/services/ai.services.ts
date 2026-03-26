@@ -73,6 +73,7 @@ async function generateInterviewReport({resume, selfDescription, jobDescription}
 
 }
 
+// helper func of generatePDF, to generate PDF from html
 async function generatePdfFromHtml({htmlContent}: {htmlContent: string}) {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
@@ -87,9 +88,9 @@ async function generatePdfFromHtml({htmlContent}: {htmlContent: string}) {
         waitUntil: 'networkidle2'
     })
 
-    await page.emulateMediaType("print");
+    await page.emulateMediaType("print"); //render to browser in print mode
 
-    const pdfBuffer = await page.pdf({
+    const pdfBuffer = await page.pdf({ //page setup
         format: 'A4',
         printBackground: true,
         margin: {
@@ -105,13 +106,14 @@ async function generatePdfFromHtml({htmlContent}: {htmlContent: string}) {
     return pdfBuffer;
 }
 
-
+// expects resume, self and job description as string
 async function generatePDF({resume, selfDescription, jobDescription}: GenerateReportParams) {
 
     const resumePdfSchema = z.object({
         html: z.string().describe("The HTML content of the resume which can be converted to PDF using any library like puppeteer")
     })
 
+    //write prompt according to ROLE, DATA, RULES, FORMATE & EXAMPLE
     const prompt = `You are a professional resume writer. Generate a clean, ATS-friendly resume in HTML format.
 
         CANDIDATE DATA (use EXACTLY as provided, do not modify names, links, or any details):
@@ -159,7 +161,7 @@ async function generatePDF({resume, selfDescription, jobDescription}: GenerateRe
 
         const jsonContent = JSON.parse(response.text!);
 
-        const pdfBuffer = await generatePdfFromHtml({htmlContent: jsonContent.html});
+        const pdfBuffer = await generatePdfFromHtml({htmlContent: jsonContent.html}); //create pdf
 
         return pdfBuffer;
 

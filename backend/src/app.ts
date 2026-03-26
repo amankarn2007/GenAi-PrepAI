@@ -1,10 +1,10 @@
 import express from "express"
 const app = express();
-import authRouter from "./routes/authRouter.js";
+import authRouter from "./routes/auth.route.js";
 import morgan from "morgan"
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import interviewRouter from "./routes/interviewRouter.js";
+import interviewRouter from "./routes/interview.route.js";
 
 app.use(express.json());
 app.use(morgan("dev"));

@@ -1,36 +1,33 @@
 import { useState } from "react"
 import { useNavigate } from "react-router"
 import { useAuth } from "../hooks/useAuth";
+import Loader from "../../interview/components/Loader";
+import Flash from "../components/Flash";
 
 export default function Login() {
     const navigate = useNavigate()
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [flash, setFlash] = useState(false);
 
     const { loading, handleLogin } = useAuth();
 
     async function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
-        console.log("func triggerd")
         e.preventDefault();
         const success = await handleLogin({email, password});
         if(success) {
             navigate("/dashboard");
+        } else {
+            setFlash(true);
         }
     }
 
     if(loading) {
-        return (
-            <div className="w-full h-screen bg-gray-950 flex items-center justify-center">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 border-10 border-t-10 border-t-red-500 rounded-full animate-spin"></div>
-                    <h3 className="text-3xl text-white">Loading...</h3>
-                </div>
-            </div>
-        )
+        return <Loader />
     }
 
     return (
-        <div className="w-full h-screen bg-gray-950 flex items-center justify-center">
+        <div className="w-full h-screen bg-gray-950 flex items-center justify-center relative">
             <div className="flex flex-col px-5 py-2 gap-5 text-black">
                 <h2 className="text-white text-5xl py-5">Login</h2>
 
@@ -52,6 +49,8 @@ export default function Login() {
                     <p className="text-white ml-2 mt-2">Don't have an account ? <span className="text-red-700 cursor-pointer" onClick={() => navigate("/register")}>Register</span></p>
                 </div>
             </div>
+            
+            { flash && <Flash setFlash={setFlash} /> }
         </div>
     )
 }

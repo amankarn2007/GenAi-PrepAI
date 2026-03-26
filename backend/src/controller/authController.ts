@@ -5,6 +5,10 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import generateToken from "../utils/generateToken.js";
 
+interface JwtPayload {
+    id: string,
+    jti: string
+}
 
 export const registerUser = async (req: Request, res: Response) => {
     const parsedResult = registerSchema.safeParse(req.body);
@@ -161,8 +165,8 @@ export const refreshToken = async (req: Request, res: Response) => {
 
     try {
         //check in refreshToken blacklist
-        const decodeRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET!) as {id: string, jti: string};
-        const decodeAccessToken = jwt.verify(accessToken, process.env.JWT_SECRET!) as {id: string, jti: string};
+        const decodeRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET!) as JwtPayload;
+        const decodeAccessToken = jwt.verify(accessToken, process.env.JWT_SECRET!) as JwtPayload;
 
         //check is Token blacklist
         const isRefreshTokenBlacklisted = await prismaClient.blacklist.findUnique({
@@ -185,16 +189,14 @@ export const refreshToken = async (req: Request, res: Response) => {
         }
 
         //now both tokens are valid, we can make token rotation now
-
-        //blacklist both token
+        //blacklist both old tokens and generate new
         await Promise.all ([
             prismaClient.blacklist.create({ data: { jti: decodeRefreshToken.jti }}),
 
             prismaClient.blacklist.create({ data: { jti: decodeAccessToken.jti }})
         ])
 
-        //now crete new tokes
-        generateToken(decodeRefreshToken.id, res); //becase decodeAccessToken can be blacklisted
+        generateToken(decodeRefreshToken.id, res);
 
         res.status(200).json({
             message: "Token refreshed successfully"
@@ -218,16 +220,16 @@ export const logout = async (req: Request, res: Response) => {
     }
 
     try {
-        //blacklist refreshToken
-        const decodeRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET!) as {jti: string};
+        const decodeRefreshToken = jwt.verify(refreshToken, process.env.JWT_SECRET!) as JwtPayload;
+        const decodeAccessToken = jwt.verify(accessToken, process.env.JWT_SECRET!) as JwtPayload;
+
+        //blacklist both tokens
         await prismaClient.blacklist.create({
             data: {
                 jti: decodeRefreshToken.jti
             }
         })
 
-        //blacklist accessToken
-        const decodeAccessToken = jwt.verify(accessToken, process.env.JWT_SECRET!) as {jti: string};
         await prismaClient.blacklist.create({
             data: {
                 jti: decodeAccessToken.jti
