@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { getMe, loginUser, logout, refreshToken, registerUser, verifyEmail } from "../controller/authController.js";
 import authUser from "../middlewares/authMiddleware.js";
-const authRouter = Router();
 
+const authRouter: Router = Router();
 
 // POST '/api/auth/register'
 authRouter.post("/register", registerUser)
