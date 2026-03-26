@@ -25,6 +25,7 @@ export default async function generateToken(userId: string, res: Response) {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         // for deployment
         sameSite: "lax",     // REQUIRED for cross-site
+        partitioned: true,
         path: "/",
     })
 
@@ -35,6 +36,7 @@ export default async function generateToken(userId: string, res: Response) {
         maxAge: 15 * 60 * 1000,
         // for deployment
         sameSite: "lax",     // REQUIRED for cross-site
+        partitioned: true,
         path: "/",
     })
 }
