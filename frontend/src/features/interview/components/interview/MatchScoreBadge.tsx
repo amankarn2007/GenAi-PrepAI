@@ -4,7 +4,7 @@ export const MatchScoreBadge = ({ score }: { score: number }) => {
   // Level based on numerical thresholds
   const isHigh = score >= 80;
   const isMedium = score >= 40 && score < 80;
-  const isLow = score < 40;
+  //const isLow = score < 40;
 
   // Select Colors based on level
   const colors = isHigh 
