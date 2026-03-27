@@ -1,10 +1,10 @@
 import axios from "axios";
 
 //const baseUrl = "http://localhost:3000";
-const baseUrl = ""; //empty becase of vercel.json
+//const baseUrl = ""; //empty becase of vercel.json
 
 export async function logoutApi() {
-    const response = await axios.get(`${baseUrl}/api/auth/logout`, {
+    const response = await axios.get(`/api/auth/logout`, {
         withCredentials: true
     });
 
@@ -25,7 +25,7 @@ export async function generateInterviewReport({jobDescription, selfDescription, 
     formData.append("resume", resumeFile);
 
     try {
-        const response = await axios.post(`${baseUrl}/api/interview`, formData, {
+        const response = await axios.post(`/api/interview`, formData, {
             headers: {
                 "Content-Type": "multipart/form-data"
             },
@@ -40,7 +40,7 @@ export async function generateInterviewReport({jobDescription, selfDescription, 
 
 // get report for a specific id
 export async function getInterviewReportById({interviewId}: {interviewId: string}) {
-    const response = await axios.get(`${baseUrl}/api/interview/report/${interviewId}`, {
+    const response = await axios.get(`/api/interview/report/${interviewId}`, {
         withCredentials: true 
     });
 
@@ -49,7 +49,7 @@ export async function getInterviewReportById({interviewId}: {interviewId: string
 
 // all reports, to show on dashboard
 export async function getAllInterviewReports() {
-    const response = await axios.get(`${baseUrl}/api/interview`, {
+    const response = await axios.get(`/api/interview`, {
         withCredentials: true 
     });
 
@@ -59,7 +59,7 @@ export async function getAllInterviewReports() {
 // create resume pdf
 export async function generateResumePdf({interviewId}: {interviewId: string}) {
     try {
-        const response = await axios.post(`${baseUrl}/api/interview/resume/pdf/${interviewId}`, null, {
+        const response = await axios.post(`/api/interview/resume/pdf/${interviewId}`, null, {
             responseType: "blob", // for binary data(pdf, images, files)
             withCredentials: true //for coolies
         })

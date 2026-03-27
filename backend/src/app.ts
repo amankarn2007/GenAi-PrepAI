@@ -17,7 +17,6 @@ const allowedOrigin = [
 app.use(cors({
     origin: allowedOrigin,
     credentials: true,
-    
 }))
 
 app.get("/", (req, res) => {

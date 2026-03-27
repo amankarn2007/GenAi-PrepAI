@@ -8,11 +8,11 @@ interface Register {
 }
 
 //const baseUrl = "http://localhost:3000";
-const baseUrl = ""; // deployed backend, " " becase of vercel.json
+//const baseUrl = ""; // deployed backend, " " becase of vercel.json
 
 export async function register({username, email, password}: Register) {
     try {
-        const response = await axios.post(`${baseUrl}/api/auth/register`, {
+        const response = await axios.post(`/api/auth/register`, {
             username, email, password
         }, {
             withCredentials: true
@@ -28,7 +28,7 @@ export async function register({username, email, password}: Register) {
 export async function login({email, password}: {email: string, password: string}) {
     try {
         console.log("req reached to auth logic")
-        const response = await axios.post(`${baseUrl}/api/auth/login`, {
+        const response = await axios.post(`/api/auth/login`, {
             email, password
         }, {
             withCredentials: true
@@ -43,7 +43,7 @@ export async function login({email, password}: {email: string, password: string}
 
 export async function logout() {
     try {
-        const response = await axios.get(`${baseUrl}/api/auth/logout`, {
+        const response = await axios.get(`/api/auth/logout`, {
             withCredentials: true
         });
 
@@ -56,7 +56,7 @@ export async function logout() {
 
 export async function getMe() {
     try {
-        const response = await axios.get(`${baseUrl}/api/auth/get-me`, {
+        const response = await axios.get(`/api/auth/get-me`, {
             withCredentials: true
         })
 
@@ -69,7 +69,7 @@ export async function getMe() {
 
 export async function  regreshToken() {
     try {
-        const res = await axios.get(`${baseUrl}/api/auth/refresh-token`, {
+        const res = await axios.get(`/api/auth/refresh-token`, {
             withCredentials: true
         })
 
